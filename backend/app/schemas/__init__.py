@@ -1,0 +1,3 @@
+"""
+ClaimIQ — Schema module inits
+"""

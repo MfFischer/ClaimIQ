@@ -66,3 +66,4 @@ ClaimIQ_Product_Plan_v2.docx
 *.log
 *.tmp
 .env
+*.zip

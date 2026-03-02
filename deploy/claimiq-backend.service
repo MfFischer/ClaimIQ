@@ -1,0 +1,18 @@
+[Unit]
+Description=ClaimIQ FastAPI Backend
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/claimiq/backend
+Environment=PATH=/var/www/claimiq/backend/venv/bin
+EnvironmentFile=/var/www/claimiq/backend/.env
+ExecStart=/var/www/claimiq/backend/venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 2
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -32,20 +32,41 @@ class Settings(BaseSettings):
     r2_bucket_name: str = ""
     r2_public_url: str = ""
 
-    # Gemini
+    # LLM
+    llm_primary_provider: str = "gemini"
     gemini_api_key: str = ""
     gemini_model: str = "gemini-1.5-flash"
+    openrouter_api_key: str = ""
+    openrouter_model: str = "google/gemini-2.0-flash-exp:free"
+    openrouter_base_url: str = "https://openrouter.ai/api/v1"
 
     # OCR
     tesseract_cmd: str = "tesseract"
     ocr_confidence_threshold: float = 0.80
-    google_vision_api_key: str = ""
-    google_vision_monthly_limit: int = 800
+    azure_vision_endpoint: str = ""
+    azure_vision_api_key: str = ""
+    azure_vision_monthly_limit: int = 5000
 
     # File handling
     max_file_size_mb: int = 10
     allowed_extensions: str = "pdf,jpg,jpeg,png,tiff,tif"
     session_ttl_hours: int = 24
+    idempotency_ttl_hours: int = 24
+
+    # Worker + reliability
+    worker_enabled: bool = True
+    worker_poll_interval_seconds: float = 1.5
+    worker_max_attempts: int = 3
+    worker_retry_backoff_seconds: int = 5
+
+    # RBAC + audit
+    audit_retention_days: int = 90
+    telemetry_lookback_hours: int = 24
+
+    # Telemetry cost estimation (per processed claim)
+    llm_gemini_estimated_cost_usd: float = 0.004
+    llm_openrouter_estimated_cost_usd: float = 0.006
+    llm_fallback_cost_multiplier: float = 1.7
 
     @property
     def cors_origins_list(self) -> list[str]:
@@ -61,8 +82,16 @@ class Settings(BaseSettings):
 
     @property
     def mock_mode(self) -> bool:
-        """If no Gemini key is set, run in mock mode (returns dummy data)."""
-        return not self.gemini_api_key
+        """If no LLM provider key is set, run in mock mode."""
+        return not (self.gemini_api_key or self.openrouter_api_key)
+
+    @property
+    def gemini_available(self) -> bool:
+        return bool(self.gemini_api_key)
+
+    @property
+    def openrouter_available(self) -> bool:
+        return bool(self.openrouter_api_key)
 
 
 @lru_cache
